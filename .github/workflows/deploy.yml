@@ -28,6 +28,10 @@ jobs:
             # Reconstruir y reiniciar los contenedores de Docker en segundo plano
             docker compose up -d --build || docker-compose up -d --build
             
+            # Instalar dependencias dentro de los contenedores
+            docker compose exec -T app composer install --optimize-autoloader --no-dev || docker-compose exec -T app composer install --optimize-autoloader --no-dev
+            docker compose exec -T frontend npm install || docker-compose exec -T frontend npm install
+            
             # Correr migraciones automáticamente por si hay nuevas tablas
             docker compose exec -T app php artisan migrate --force || docker-compose exec -T app php artisan migrate --force
             
