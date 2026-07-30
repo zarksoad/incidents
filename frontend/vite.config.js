@@ -5,7 +5,7 @@ import vuetify from 'vite-plugin-vuetify'
 export default defineConfig({
   plugins: [
     vue(),
-    vuetify({ autoImport: true }),
+    vuetify({ autoImport: true, styles: { configFile: 'src/assets/settings.scss' } }),
   ],
   server: {
     host: '0.0.0.0',

@@ -63,11 +63,11 @@
             <v-list density="compact" bg-color="transparent">
               <v-list-item v-for="(val, key) in stats.by_status" :key="key">
                 <template v-slot:prepend>
-                  <v-icon :color="statusColor(key)" icon="mdi-circle" size="12" class="mr-3" />
+                  <v-icon :color="key" icon="mdi-circle" size="12" class="mr-3" />
                 </template>
                 <v-list-item-title class="text-capitalize">{{ formatStatus(key) }}</v-list-item-title>
                 <template v-slot:append>
-                  <v-chip size="small" :color="statusColor(key)" variant="tonal">{{ val }}</v-chip>
+                  <v-chip size="small" :color="key" variant="tonal">{{ val }}</v-chip>
                 </template>
               </v-list-item>
             </v-list>
@@ -79,11 +79,11 @@
             <v-list density="compact" bg-color="transparent">
               <v-list-item v-for="(val, key) in stats.by_priority" :key="key">
                 <template v-slot:prepend>
-                  <v-icon :color="priorityColor(key)" icon="mdi-circle" size="12" class="mr-3" />
+                  <v-icon :color="key" icon="mdi-circle" size="12" class="mr-3" />
                 </template>
                 <v-list-item-title class="text-capitalize">{{ key }}</v-list-item-title>
                 <template v-slot:append>
-                  <v-chip size="small" :color="priorityColor(key)" variant="tonal">{{ val }}</v-chip>
+                  <v-chip size="small" :color="key" variant="tonal">{{ val }}</v-chip>
                 </template>
               </v-list-item>
             </v-list>
@@ -99,16 +99,6 @@ import { useDashboard } from '../composables/useDashboard'
 import BeautifulSkeleton from '../components/BeautifulSkeleton.vue'
 
 const { stats, loading } = useDashboard()
-
-function statusColor(status) {
-  const map = { abierto: 'info', en_progreso: 'warning', cerrado: 'success', vencido: 'error' }
-  return map[status] || 'grey'
-}
-
-function priorityColor(priority) {
-  const map = { baja: 'success', media: 'info', alta: 'warning', critica: 'error' }
-  return map[priority] || 'grey'
-}
 
 function formatStatus(status) {
   return status.replace('_', ' ')

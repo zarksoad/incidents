@@ -22,18 +22,14 @@
         <div class="d-flex align-center justify-space-between mb-4">
           <h2 class="text-h5 font-weight-bold">{{ incident.title }}</h2>
           <div class="d-flex ga-2">
-            <v-chip :color="priorityColor(incident.priority)" variant="tonal" class="text-capitalize">
-              {{ incident.priority }}
-            </v-chip>
-            <v-chip :color="statusColor(incident.status)" variant="tonal" class="text-capitalize">
-              {{ formatStatus(incident.status) }}
-            </v-chip>
+            <IncidentPriorityChip :priority="incident.priority" />
+            <IncidentStatusChip :status="incident.status" />
           </div>
         </div>
 
         <v-divider class="mb-4" />
 
-        <div class="text-body-1 mb-6" style="white-space: pre-line;">{{ incident.description }}</div>
+        <div class="text-body-1 mb-6 whitespace-pre-line">{{ incident.description }}</div>
 
         <v-row>
           <v-col cols="12" sm="6" md="3">
@@ -75,38 +71,7 @@
         </div>
       </v-card>
       
-      <v-card class="pa-4 pa-sm-8 glass-card mt-6">
-        <h3 class="text-h6 font-weight-bold mb-4">Historial de Cambios</h3>
-        <v-timeline density="compact" side="end" align="start">
-          <v-timeline-item
-            v-for="log in incident.audit_logs"
-            :key="log.id"
-            :dot-color="log.action === 'Creado' ? 'success' : (log.action === 'Eliminado' ? 'error' : 'info')"
-            size="small"
-          >
-            <div class="d-flex flex-column">
-              <div class="d-flex align-center justify-space-between">
-                <strong>{{ log.user ? log.user.name : 'Sistema' }}</strong>
-                <span class="text-caption text-medium-emphasis">
-                  {{ new Date(log.created_at).toLocaleString() }}
-                </span>
-              </div>
-              <div class="mt-1">
-                {{ log.action }} el incidente.
-              </div>
-              <div v-if="log.action === 'Actualizado' && log.details && Object.keys(log.details).length" class="text-caption mt-2 bg-grey-lighten-4 pa-2 rounded">
-                <div v-for="(val, key) in log.details" :key="key" class="mb-1">
-                  <strong class="text-capitalize">{{ formatLogKey(key) }}:</strong> <span class="text-high-emphasis">{{ val }}</span>
-                </div>
-              </div>
-            </div>
-          </v-timeline-item>
-          
-          <v-timeline-item v-if="!incident.audit_logs || incident.audit_logs.length === 0" dot-color="grey" size="small">
-            <div class="text-medium-emphasis">No hay historial registrado.</div>
-          </v-timeline-item>
-        </v-timeline>
-      </v-card>
+      <IncidentTimeline :logs="incident.audit_logs" />
     </template>
 
     <v-dialog v-model="deleteDialog" max-width="400">
@@ -128,6 +93,9 @@ import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useIncidents } from '../composables/useIncidents'
 import BeautifulSkeleton from '../components/BeautifulSkeleton.vue'
+import IncidentPriorityChip from '../components/atoms/IncidentPriorityChip.vue'
+import IncidentStatusChip from '../components/atoms/IncidentStatusChip.vue'
+import IncidentTimeline from '../components/organisms/IncidentTimeline.vue'
 
 const route = useRoute()
 
@@ -141,31 +109,8 @@ const {
 
 const deleteDialog = ref(false)
 
-function statusColor(status) {
-  const map = { abierto: 'info', en_progreso: 'warning', cerrado: 'success', vencido: 'error' }
-  return map[status] || 'grey'
-}
 
-function priorityColor(priority) {
-  const map = { baja: 'success', media: 'info', alta: 'warning', critica: 'error' }
-  return map[priority] || 'grey'
-}
 
-function formatStatus(status) {
-  return status.replace('_', ' ')
-}
-
-function formatLogKey(key) {
-  const map = {
-    title: 'Título',
-    description: 'Descripción',
-    priority: 'Prioridad',
-    status: 'Estado',
-    assigned_id: 'Asignado (ID)',
-    due_date: 'Fecha de vencimiento',
-  }
-  return map[key] || key
-}
 
 function formatDate(dateStr) {
   return new Date(dateStr).toLocaleDateString('es-ES', {
