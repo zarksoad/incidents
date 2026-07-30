@@ -26,10 +26,10 @@ jobs:
             git pull origin main
             
             # Reconstruir y reiniciar los contenedores de Docker en segundo plano
-            docker-compose up -d --build
+            docker compose up -d --build || docker-compose up -d --build
             
             # Correr migraciones automáticamente por si hay nuevas tablas
-            docker-compose exec -T app php artisan migrate --force
+            docker compose exec -T app php artisan migrate --force || docker-compose exec -T app php artisan migrate --force
             
             # Limpiar caché de Laravel para asegurar que tome los últimos cambios
-            docker-compose exec -T app php artisan optimize:clear
+            docker compose exec -T app php artisan optimize:clear || docker-compose exec -T app php artisan optimize:clear
