@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar color="surface" elevation="1" class="d-lg-none">
+  <v-app-bar color="surface" elevation="1" v-if="!$vuetify.display.lgAndUp">
     <v-app-bar-nav-icon @click="drawer = !drawer" />
     <v-toolbar-title>Incident Manager</v-toolbar-title>
   </v-app-bar>
@@ -100,11 +100,3 @@ async function handleLogout() {
   router.push('/login')
 }
 </script>
-
-<style>
-@media (min-width: 1280px) {
-  main.v-main {
-    padding-top: 0 !important;
-  }
-}
-</style>
