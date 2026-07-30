@@ -59,6 +59,11 @@ services:
     restart: unless-stopped
     expose:
       - "3000"
+    environment:
+      - VITE_REVERB_APP_KEY=reverbkey
+      - VITE_REVERB_HOST=incidents.duckdns.org
+      - VITE_REVERB_PORT=8000
+      - VITE_REVERB_SCHEME=http
     volumes:
       - ./frontend:/app
       - /app/node_modules
