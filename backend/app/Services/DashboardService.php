@@ -8,9 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardService
 {
-    /**
-     * Get aggregated statistics for the dashboard.
-     */
+    
     public function getDashboardStats(Request $request): array
     {
         $user = $request->user();

@@ -6,7 +6,7 @@
 defineProps({
   type: {
     type: String,
-    default: 'card', // Options: card, text, title, table-row
+    default: 'card', 
   },
   height: {
     type: String,

@@ -26,6 +26,7 @@
             <v-text-field
               v-model="form.title"
               label="Título"
+              color="primary"
               :rules="[rules.required]"
             />
           </v-col>
@@ -35,6 +36,7 @@
               label="Descripción"
               rows="4"
               variant="outlined"
+              color="primary"
               :rules="[rules.required]"
             />
           </v-col>
@@ -43,6 +45,7 @@
               v-model="form.priority"
               label="Prioridad"
               :items="priorityOptions"
+              color="primary"
               :rules="[rules.required]"
             />
           </v-col>
@@ -51,6 +54,7 @@
               v-model="form.status"
               label="Estado"
               :items="statusOptions"
+              color="primary"
               :rules="[rules.required]"
             />
           </v-col>
@@ -61,6 +65,7 @@
               :items="users"
               item-title="name"
               item-value="id"
+              color="primary"
               clearable
             />
           </v-col>
@@ -69,6 +74,7 @@
               v-model="form.due_date"
               label="Fecha de vencimiento"
               type="date"
+              color="primary"
               :rules="[rules.required]"
             />
           </v-col>

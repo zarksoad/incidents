@@ -19,7 +19,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 ])]
 class Incident extends Model
 {
-    /** @use HasFactory<IncidentFactory> */
+    
     use HasFactory;
 
     protected function casts(): array

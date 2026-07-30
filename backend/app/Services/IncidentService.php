@@ -12,9 +12,7 @@ use Illuminate\Database\Eloquent\Collection;
 
 class IncidentService
 {
-    /**
-     * Get paginated incidents based on request filters.
-     */
+    
     public function getPaginatedIncidents(Request $request): LengthAwarePaginator
     {
         $query = $this->buildFilteredQuery($request);
@@ -26,17 +24,13 @@ class IncidentService
         return $query->paginate($perPage);
     }
 
-    /**
-     * Get all incidents for export based on request filters.
-     */
+    
     public function getIncidentsForExport(Request $request): Collection
     {
         return $this->buildFilteredQuery($request)->get();
     }
 
-    /**
-     * Build the eloquent query with filters and permissions applied.
-     */
+    
     private function buildFilteredQuery(Request $request): Builder
     {
         $query = Incident::with(['creator:id,name', 'assignee:id,name']);
@@ -77,9 +71,7 @@ class IncidentService
         return $query;
     }
 
-    /**
-     * Apply sorting to the query.
-     */
+    
     private function applySorting(Builder $query, Request $request): void
     {
         $sortBy = $request->input('sort_by', 'created_at');
@@ -91,9 +83,7 @@ class IncidentService
         }
     }
 
-    /**
-     * Create a new incident.
-     */
+    
     public function createIncident(array $data, int $userId): Incident
     {
         $data['user_id'] = $userId;
@@ -105,9 +95,7 @@ class IncidentService
         return $incident;
     }
 
-    /**
-     * Update an existing incident.
-     */
+    
     public function updateIncident(Incident $incident, array $data): Incident
     {
         $incident->update($data);
@@ -118,9 +106,7 @@ class IncidentService
         return $incident;
     }
 
-    /**
-     * Delete an incident.
-     */
+    
     public function deleteIncident(Incident $incident): void
     {
         $incidentId = $incident->id;

@@ -59,7 +59,7 @@
     </v-container>
   </v-main>
 
-  <!-- Global Toast / Snackbar -->
+  
   <v-snackbar
     v-model="notifications.show"
     :color="notifications.color"
@@ -100,3 +100,11 @@ async function handleLogout() {
   router.push('/login')
 }
 </script>
+
+<style>
+@media (min-width: 1280px) {
+  main.v-main {
+    padding-top: 0 !important;
+  }
+}
+</style>

@@ -74,7 +74,7 @@
           </v-btn>
         </div>
       </v-card>
-      <!-- Historial de Auditoría -->
+      
       <v-card class="pa-4 pa-sm-8 glass-card mt-6">
         <h3 class="text-h6 font-weight-bold mb-4">Historial de Cambios</h3>
         <v-timeline density="compact" side="end" align="start">
