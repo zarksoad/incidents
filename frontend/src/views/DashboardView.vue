@@ -11,7 +11,7 @@
     <template v-else>
       <v-row class="mb-4">
         <v-col cols="12" sm="6" md="3">
-          <v-card class="pa-6 glass-card hover-lift">
+          <v-card class="pa-4 pa-sm-6 glass-card hover-lift">
             <div class="d-flex align-center justify-space-between">
               <div>
                 <div class="text-caption text-medium-emphasis">Total Incidentes</div>
@@ -22,7 +22,7 @@
           </v-card>
         </v-col>
         <v-col cols="12" sm="6" md="3">
-          <v-card class="pa-6 glass-card hover-lift">
+          <v-card class="pa-4 pa-sm-6 glass-card hover-lift">
             <div class="d-flex align-center justify-space-between">
               <div>
                 <div class="text-caption text-medium-emphasis">Vencidos</div>
@@ -33,7 +33,7 @@
           </v-card>
         </v-col>
         <v-col cols="12" sm="6" md="3">
-          <v-card class="pa-6 glass-card hover-lift">
+          <v-card class="pa-4 pa-sm-6 glass-card hover-lift">
             <div class="d-flex align-center justify-space-between">
               <div>
                 <div class="text-caption text-medium-emphasis">Abiertos</div>
@@ -44,7 +44,7 @@
           </v-card>
         </v-col>
         <v-col cols="12" sm="6" md="3">
-          <v-card class="pa-6 glass-card hover-lift">
+          <v-card class="pa-4 pa-sm-6 glass-card hover-lift">
             <div class="d-flex align-center justify-space-between">
               <div>
                 <div class="text-caption text-medium-emphasis">Cerrados</div>
@@ -58,7 +58,7 @@
 
       <v-row>
         <v-col cols="12" md="6">
-          <v-card color="surface" class="pa-6" style="border: 1px solid rgba(108, 99, 255, 0.1);">
+          <v-card color="surface" class="pa-4 pa-sm-6" style="border: 1px solid rgba(108, 99, 255, 0.1);">
             <h3 class="text-h6 mb-4">Por Estado</h3>
             <v-list density="compact" bg-color="transparent">
               <v-list-item v-for="(val, key) in stats.by_status" :key="key">
@@ -74,7 +74,7 @@
           </v-card>
         </v-col>
         <v-col cols="12" md="6">
-          <v-card color="surface" class="pa-6" style="border: 1px solid rgba(108, 99, 255, 0.1);">
+          <v-card color="surface" class="pa-4 pa-sm-6" style="border: 1px solid rgba(108, 99, 255, 0.1);">
             <h3 class="text-h6 mb-4">Por Prioridad</h3>
             <v-list density="compact" bg-color="transparent">
               <v-list-item v-for="(val, key) in stats.by_priority" :key="key">

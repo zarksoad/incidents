@@ -110,60 +110,65 @@
         <BeautifulSkeleton type="table-row" v-for="n in 5" :key="n" />
       </template>
       <template v-else>
-        <v-data-table-server
-        :headers="headers"
-        :items="incidents"
-        :items-length="totalItems"
-        :loading="loading"
-        :items-per-page="itemsPerPage"
-        :page="page"
-        @update:page="page = $event; fetchIncidents()"
-        @update:items-per-page="itemsPerPage = $event; fetchIncidents()"
-        @update:sort-by="handleSort"
-        hover
-      >
-        <template v-slot:item.priority="{ item }">
-          <v-chip :color="priorityColor(item.priority)" size="small" variant="tonal" class="text-capitalize">
-            {{ item.priority }}
-          </v-chip>
-        </template>
-
-        <template v-slot:item.status="{ item }">
-          <v-chip :color="statusColor(item.status)" size="small" variant="tonal" class="text-capitalize">
-            {{ formatStatus(item.status) }}
-          </v-chip>
-        </template>
-
-        <template v-slot:item.assignee="{ item }">
-          {{ item.assignee?.name || '—' }}
-        </template>
-
-        <template v-slot:item.due_date="{ item }">
-          <span :class="{ 'text-error': item.is_overdue }">
-            {{ item.due_date }}
-            <v-icon v-if="item.is_overdue" size="16" color="error" icon="mdi-alert-circle" class="ml-1" />
-          </span>
-        </template>
-
-        <template v-slot:item.actions="{ item }">
-          <v-btn icon size="small" variant="text" :to="{ name: 'IncidentDetail', params: { id: item.id } }">
-            <v-icon icon="mdi-eye" size="18" />
-          </v-btn>
-          <v-btn icon size="small" variant="text" :to="{ name: 'EditIncident', params: { id: item.id } }">
-            <v-icon icon="mdi-pencil" size="18" />
-          </v-btn>
-          <v-btn
-            v-if="auth.user?.role === 'admin'"
-            icon
-            size="small"
-            variant="text"
-            color="error"
-            @click="confirmDelete(item)"
+        <div class="table-responsive">
+          <v-data-table-server
+            :headers="headers"
+            :items="incidents"
+            :items-length="totalItems"
+            :loading="loading"
+            :items-per-page="itemsPerPage"
+            :page="page"
+            :mobile-breakpoint="0"
+            @update:page="page = $event; fetchIncidents()"
+            @update:items-per-page="itemsPerPage = $event; fetchIncidents()"
+            @update:sort-by="handleSort"
+            hover
           >
-            <v-icon icon="mdi-delete" size="18" />
-          </v-btn>
-        </template>
-      </v-data-table-server>
+            <template v-slot:item.priority="{ item }">
+              <v-chip :color="priorityColor(item.priority)" size="small" variant="tonal" class="text-capitalize">
+                {{ item.priority }}
+              </v-chip>
+            </template>
+
+            <template v-slot:item.status="{ item }">
+              <v-chip :color="statusColor(item.status)" size="small" variant="tonal" class="text-capitalize">
+                {{ formatStatus(item.status) }}
+              </v-chip>
+            </template>
+
+            <template v-slot:item.assignee="{ item }">
+              {{ item.assignee?.name || '—' }}
+            </template>
+
+            <template v-slot:item.due_date="{ item }">
+              <span :class="{ 'text-error': item.is_overdue }">
+                {{ item.due_date }}
+                <v-icon v-if="item.is_overdue" size="16" color="error" icon="mdi-alert-circle" class="ml-1" />
+              </span>
+            </template>
+
+            <template v-slot:item.actions="{ item }">
+              <div class="d-flex flex-nowrap">
+                <v-btn icon size="small" variant="text" :to="{ name: 'IncidentDetail', params: { id: item.id } }">
+                  <v-icon icon="mdi-eye" size="18" />
+                </v-btn>
+                <v-btn icon size="small" variant="text" :to="{ name: 'EditIncident', params: { id: item.id } }">
+                  <v-icon icon="mdi-pencil" size="18" />
+                </v-btn>
+                <v-btn
+                  v-if="auth.user?.role === 'admin'"
+                  icon
+                  size="small"
+                  variant="text"
+                  color="error"
+                  @click="confirmDelete(item)"
+                >
+                  <v-icon icon="mdi-delete" size="18" />
+                </v-btn>
+              </div>
+            </template>
+          </v-data-table-server>
+        </div>
       </template>
     </v-card>
 
@@ -396,3 +401,11 @@ onUnmounted(() => {
   }
 })
 </script>
+
+<style scoped>
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+</style>

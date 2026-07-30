@@ -59,8 +59,9 @@
 
         <v-divider class="my-4" />
 
-        <div class="d-flex justify-end ga-3">
+        <div class="d-flex flex-column flex-sm-row justify-end ga-3">
           <v-btn
+            class="w-100 w-sm-auto"
             variant="tonal"
             color="primary"
             prepend-icon="mdi-pencil"
@@ -68,15 +69,16 @@
           >
             Editar
           </v-btn>
-          <v-btn variant="tonal" color="error" prepend-icon="mdi-delete" @click="deleteDialog = true">
+          </v-btn>
+          <v-btn class="w-100 w-sm-auto" variant="tonal" color="error" prepend-icon="mdi-delete" @click="deleteDialog = true">
             Eliminar
           </v-btn>
         </div>
       </v-card>
       <!-- Historial de Auditoría -->
-      <v-card class="pa-8 glass-card mt-6">
+      <v-card class="pa-4 pa-sm-8 glass-card mt-6">
         <h3 class="text-h6 font-weight-bold mb-4">Historial de Cambios</h3>
-        <v-timeline density="compact" side="end">
+        <v-timeline density="compact" side="end" align="start">
           <v-timeline-item
             v-for="log in incident.audit_logs"
             :key="log.id"

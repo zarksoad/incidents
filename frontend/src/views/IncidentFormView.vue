@@ -74,9 +74,9 @@
           </v-col>
         </v-row>
 
-        <div class="d-flex justify-end mt-4 ga-3">
-          <v-btn variant="text" @click="$router.back()">Cancelar</v-btn>
-          <v-btn type="submit" color="primary" :loading="saving">
+        <div class="d-flex flex-column-reverse flex-sm-row justify-end mt-4 ga-3">
+          <v-btn class="w-100 w-sm-auto" variant="text" @click="$router.back()" size="large">Cancelar</v-btn>
+          <v-btn class="w-100 w-sm-auto" type="submit" color="primary" :loading="saving" size="large">
             {{ isEdit ? 'Actualizar' : 'Crear' }}
           </v-btn>
         </div>

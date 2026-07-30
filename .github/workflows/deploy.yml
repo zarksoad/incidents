@@ -1,0 +1,35 @@
+name: Deploy to Hetzner
+
+on:
+  push:
+    branches:
+      - main # Ejecutar solo cuando se hace push a la rama main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🚚 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🚀 Deploy to Server via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HETZNER_HOST }}       # IP de tu servidor Hetzner
+          username: ${{ secrets.HETZNER_USER }}   # Usuario (ej. root)
+          password: ${{ secrets.HETZNER_PASSWORD }} # Contraseña de tu servidor
+          script: |
+            cd /var/www/prueba-tecnica
+            
+            # Traer los últimos cambios
+            git pull origin main
+            
+            # Reconstruir y reiniciar los contenedores de Docker en segundo plano
+            docker-compose up -d --build
+            
+            # Correr migraciones automáticamente por si hay nuevas tablas
+            docker-compose exec -T app php artisan migrate --force
+            
+            # Limpiar caché de Laravel para asegurar que tome los últimos cambios
+            docker-compose exec -T app php artisan optimize:clear
