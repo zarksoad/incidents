@@ -60,6 +60,7 @@ services:
     expose:
       - "3000"
     environment:
+      - VITE_API_URL=https://incidents.duckdns.org/api
       - VITE_REVERB_APP_KEY=clave_secreta_local
       - VITE_REVERB_HOST=incidents.duckdns.org
       - VITE_REVERB_PORT=443
