@@ -69,7 +69,6 @@
           >
             Editar
           </v-btn>
-          </v-btn>
           <v-btn class="w-100 w-sm-auto" variant="tonal" color="error" prepend-icon="mdi-delete" @click="deleteDialog = true">
             Eliminar
           </v-btn>
