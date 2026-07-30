@@ -55,19 +55,16 @@ services:
     build:
       context: .
       dockerfile: docker/frontend/Dockerfile
+      args:
+        - VITE_API_URL=https://incidents.duckdns.org/api
+        - VITE_REVERB_APP_KEY=clave_secreta_local
+        - VITE_REVERB_HOST=incidents.duckdns.org
+        - VITE_REVERB_PORT=443
+        - VITE_REVERB_SCHEME=https
     container_name: incident_frontend
     restart: unless-stopped
     expose:
-      - "3000"
-    environment:
-      - VITE_API_URL=https://incidents.duckdns.org/api
-      - VITE_REVERB_APP_KEY=clave_secreta_local
-      - VITE_REVERB_HOST=incidents.duckdns.org
-      - VITE_REVERB_PORT=443
-      - VITE_REVERB_SCHEME=https
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
+      - "80"
     networks:
       - app-network
     depends_on:
