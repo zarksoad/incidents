@@ -10,6 +10,7 @@ use App\Services\IncidentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class IncidentController extends Controller
@@ -47,18 +48,14 @@ class IncidentController extends Controller
 
     public function update(UpdateIncidentRequest $request, Incident $incident): IncidentResource
     {
-        $incident = $this->incidentService->updateIncident($incident, $request->validated());
+        $incident = $this->incidentService->updateIncident($incident, $request->validated(), $request->user()?->id);
 
         return new IncidentResource($incident);
     }
 
     public function destroy(Incident $incident): JsonResponse|\Illuminate\Http\Response
     {
-        $user = request()->user();
-        
-        if ($user && $user->role !== 'admin') {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
+        Gate::authorize('delete', $incident);
 
         $this->incidentService->deleteIncident($incident);
 

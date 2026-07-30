@@ -61,10 +61,15 @@ class IncidentService
         }
 
         if ($request->filled('search')) {
-            $search = $request->search;
+            // Remove special boolean mode operators to prevent SQL syntax errors
+            $search = preg_replace('/[+\-><\(\)~*\"@]+/', ' ', $request->search);
+            $search = trim($search);
+
             $query->where(function (Builder $q) use ($search) {
-                $q->whereRaw('MATCH(title, description) AGAINST(? IN BOOLEAN MODE)', [$search . '*'])
-                  ->orWhere('title', 'LIKE', "%{$search}%");
+                if (!empty($search)) {
+                    $q->whereRaw('MATCH(title, description) AGAINST(? IN BOOLEAN MODE)', [$search . '*'])
+                      ->orWhere('title', 'LIKE', "%{$search}%");
+                }
             });
         }
 
@@ -89,6 +94,12 @@ class IncidentService
         $data['user_id'] = $userId;
         $incident = Incident::create($data);
 
+        $incident->auditLogs()->create([
+            'user_id' => $userId,
+            'action' => 'Creado',
+            'details' => $incident->toArray(),
+        ]);
+
         $incident->load(['creator:id,name', 'assignee:id,name']);
         event(new IncidentSaved($incident));
 
@@ -96,9 +107,20 @@ class IncidentService
     }
 
     
-    public function updateIncident(Incident $incident, array $data): Incident
+    public function updateIncident(Incident $incident, array $data, ?int $userId = null): Incident
     {
         $incident->update($data);
+        $changes = $incident->getChanges();
+        unset($changes['updated_at']);
+        
+        if (count($changes) > 0) {
+            $incident->auditLogs()->create([
+                'user_id' => $userId,
+                'action' => 'Actualizado',
+                'details' => $changes,
+            ]);
+        }
+        
         $incident->load(['creator:id,name', 'assignee:id,name']);
 
         event(new IncidentSaved($incident));

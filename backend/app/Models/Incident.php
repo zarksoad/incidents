@@ -44,26 +44,5 @@ class Incident extends Model
         return $this->hasMany(AuditLog::class)->latest();
     }
 
-    protected static function booted()
-    {
-        static::created(function ($incident) {
-            $incident->auditLogs()->create([
-                'user_id' => auth()->id(),
-                'action' => 'Creado',
-                'details' => $incident->toArray(),
-            ]);
-        });
-
-        static::updated(function ($incident) {
-            $changes = $incident->getChanges();
-            unset($changes['updated_at']);
-            if (count($changes) > 0) {
-                $incident->auditLogs()->create([
-                    'user_id' => auth()->id(),
-                    'action' => 'Actualizado',
-                    'details' => $changes,
-                ]);
-            }
-        });
-    }
+    // Refactored: Audit logs are now handled in the IncidentService to decouple from HTTP session
 }
