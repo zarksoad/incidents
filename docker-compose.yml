@@ -43,6 +43,7 @@ services:
       - app-network
     depends_on:
       - app
+      - frontend
 
   db:
     image: mysql:8.0
@@ -81,8 +82,6 @@ services:
       - "80"
     networks:
       - app-network
-    depends_on:
-      - nginx
 
 networks:
   app-network:
