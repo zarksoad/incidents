@@ -70,11 +70,11 @@ services:
       context: .
       dockerfile: docker/frontend/Dockerfile
       args:
-        - VITE_API_URL=https://incidents.duckdns.org/api
-        - VITE_REVERB_APP_KEY=clave_secreta_local
-        - VITE_REVERB_HOST=incidents.duckdns.org
-        - VITE_REVERB_PORT=443
-        - VITE_REVERB_SCHEME=https
+        - VITE_API_URL=${VITE_API_URL:-http://localhost:8000/api}
+        - VITE_REVERB_APP_KEY=${VITE_REVERB_APP_KEY:-reverbkey}
+        - VITE_REVERB_HOST=${VITE_REVERB_HOST:-localhost}
+        - VITE_REVERB_PORT=${VITE_REVERB_PORT:-8080}
+        - VITE_REVERB_SCHEME=${VITE_REVERB_SCHEME:-http}
     container_name: incident_frontend
     restart: unless-stopped
     expose:
