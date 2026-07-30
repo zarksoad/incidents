@@ -13,7 +13,7 @@
     </div>
 
     <v-card class="mb-4 pa-6 glass-card">
-      <v-row dense class="align-center">
+      <v-row density="comfortable" class="align-center">
         <v-col cols="12" sm="4" md="2" class="flex-grow-1">
           <v-text-field
             v-model="filters.search"
