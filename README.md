@@ -2,85 +2,31 @@
 
 Este repositorio contiene la prueba técnica para un **Sistema de Gestión de Incidentes**, desarrollado utilizando estándares Senior de la industria con **Laravel 11** en el Backend y **Vue 3** en el Frontend. 
 
-El código respeta fielmente los principios SOLID, Clean Code y DRY, garantizando una alta escalabilidad, mantenibilidad y un rendimiento óptimo.
+El código respeta fielmente los principios SOLID, Clean Code, DRY y **Atomic Design**, garantizando una alta escalabilidad, mantenibilidad y un rendimiento óptimo.
 
 ---
 
-## 🏗️ Diagrama de Arquitectura (Backend & Frontend)
+## 🏗️ Arquitectura de Contenedores (Docker)
 
-El siguiente diagrama ilustra cómo interactúa el Frontend (Vue) con el Backend (Laravel), y cómo los componentes internos están separados según sus responsabilidades (Service Pattern y Composables).
+Todo el proyecto está contenerizado utilizando Docker Compose para garantizar que funcione idénticamente en cualquier entorno (Local y Producción).
 
-```mermaid
-flowchart TD
-    subgraph Frontend [📱 Frontend: Vue 3 (Vite)]
-        UI[Vistas Vue\nIncidentList, Dashboard]
-        Composables[Composables\nuseIncidents, useDashboard]
-        Pinia[Pinia Store\nNotifications]
-        Axios[API Client\nAxios + Interceptors]
-        Echo[Laravel Echo\nWebSockets]
-        
-        UI -->|Usa| Composables
-        UI -->|Dispara| Pinia
-        Composables -->|Peticiones HTTP| Axios
-        Composables -->|Escucha Eventos| Echo
-    end
+El ecosistema se compone de los siguientes **5 contenedores**:
 
-    subgraph Backend [⚙️ Backend: Laravel 11]
-        Routes[API Routes\nSanctum Auth]
-        Controllers[Skinny Controllers\nIncidentController]
-        Services[Services Layer\nIncidentService]
-        Eloquent[Eloquent ORM\nModelos y Relaciones]
-        Reverb[Laravel Reverb\nWebSocket Server]
-        
-        Axios -->|Peticiones REST| Routes
-        Routes --> Controllers
-        Controllers -->|Delega lógica| Services
-        Services -->|Consultas| Eloquent
-        Services -->|Emite Eventos| Reverb
-        Reverb -->|Broadcasting| Echo
-    end
-
-    subgraph Database [🗄️ Base de Datos]
-        MySQL[(MySQL / SQLite)]
-        Eloquent --> MySQL
-    end
-```
+1. **`incident_nginx` (Nginx):** El proxy reverso principal y servidor web estático. Sirve la aplicación Frontend empaquetada (Vue) por el puerto `80` (expuesto al `8000` en tu máquina local) y redirige las peticiones `/api` al backend.
+2. **`incident_frontend` (Vite/Vue):** Contenedor *Builder*. Se encarga de descargar las dependencias de Node, compilar los archivos `.js` y `.css` (incluyendo SASS), y pasárselos a Nginx.
+3. **`incident_app` (PHP-FPM/Laravel):** El corazón del Backend. Procesa todas las reglas de negocio, conexión a base de datos y provee la API RESTful. Expone el puerto `9000` interno.
+4. **`incident_reverb` (Laravel Reverb):** Servidor de WebSockets de Laravel para comunicación en tiempo real. Notifica al frontend instantáneamente cuando se crea, edita o borra un incidente. Expone el puerto `8080`.
+5. **`incident_db` (MySQL 8):** Base de datos relacional persistida en el volumen `db-data`. Expone el puerto `3306`.
 
 ---
 
-## 💻 Detalles del Frontend (Vue 3)
+## 🛠️ Despliegue y Ejecución Local con Docker
 
-El frontend está construido como una *Single Page Application* (SPA) optimizada, separando la lógica de negocio de la interfaz de usuario:
-
-- **Framework:** Vue 3 (Composition API) + Vite (para builds ultra-rápidos).
-- **UI Library:** Vuetify 3 (para componentes estéticos y responsive).
-- **State Management:** Pinia (para el manejo del estado global, como notificaciones).
-- **Enrutamiento:** Vue Router (con soporte para vistas como Formulario, Detalle y Dashboard).
-- **WebSockets:** Laravel Echo + Pusher JS, escuchando en tiempo real las actualizaciones del servidor Reverb.
-- **Arquitectura Interna:** Uso intensivo de **Composables** (`useIncidents.js`, `useDashboard.js`). Esto evita componentes "gordos", permitiendo testear la lógica de manera aislada y reutilizar código.
-
----
-
-## ⚙️ Detalles del Backend (Laravel 11)
-
-El backend provee una API RESTful completamente autenticada y orientada a servicios:
-
-- **Framework:** Laravel 11 (con PHP 8.3).
-- **Autenticación:** Laravel Sanctum (Token-based Auth).
-- **Arquitectura:** **Service Layer Pattern**. Los controladores son extremadamente "flacos" (Skinny Controllers). Toda la lógica compleja (filtros, creación, agregaciones) vive en clases `Service` dedicadas (`IncidentService`, `DashboardService`).
-- **Tiempo Real:** Integración con Laravel Reverb para broadcasting nativo de WebSockets, avisando al Frontend en tiempo real cuando un incidente es creado, actualizado o eliminado.
-- **Rendimiento:** Prevención de consultas N+1 mediante el uso de Eager Loading (`->with()`) desde la capa de servicios.
-
----
-
-## 🛠️ Despliegue y Ejecución Local
-
-A continuación, los pasos para ejecutar todo el ecosistema (Frontend, Backend y WebSockets) de manera local.
+A continuación, los pasos exactos para levantar todo el proyecto con un solo comando.
 
 ### Prerrequisitos
-- PHP 8.3+ y Composer
-- Node.js (v18+) y npm/yarn
-- Base de datos local (o utilizar SQLite por defecto configurado en Laravel)
+- Tener **Docker** y **Docker Compose** instalados en tu máquina.
+- Git.
 
 ### 1. Clonar el repositorio
 ```bash
@@ -88,85 +34,70 @@ git clone https://github.com/tu-usuario/prueba-tecnica.git
 cd prueba-tecnica
 ```
 
-### 2. Configurar el Backend (Laravel)
-Abre una terminal en la carpeta `/backend` y ejecuta:
+### 2. Configurar Variables de Entorno
+Debes crear los archivos `.env` basándote en los ejemplos provistos.
 
+**Para el Backend (`/backend/.env`):**
+Copia el archivo de ejemplo:
 ```bash
-cd backend
-composer install
-cp .env.example .env
-php artisan key:generate
+cp backend/.env.example backend/.env
 ```
+*Asegúrate de que las credenciales de DB coincidan con las del docker-compose.yml (`DB_HOST=db`, `DB_DATABASE=incident_db`, `DB_USERNAME=laravel`, `DB_PASSWORD=secret`).*
 
-Si usas SQLite (opción más rápida para desarrollo), crea el archivo:
-```bash
-touch database/database.sqlite
-```
-
-Luego ejecuta las migraciones (opcionalmente con `--seed` si tienes seeders configurados):
-```bash
-php artisan migrate --seed
-```
-
-### 3. Iniciar el Servidor Laravel y Reverb (WebSockets)
-Puedes usar comandos separados o levantar todo junto si configuraste supervisor o comandos paralelos. En consolas separadas:
-
-```bash
-# Terminal 1 - Servidor HTTP
-php artisan serve
-
-# Terminal 2 - Servidor WebSockets (Reverb)
-php artisan reverb:start
-```
-
-### 4. Configurar el Frontend (Vue 3)
-Abre otra terminal en la carpeta `/frontend` y ejecuta:
-
-```bash
-cd frontend
-npm install
-```
-
-Asegúrate de tener un archivo `.env` en el frontend con la URL de tu API y configuración de Reverb (Echo):
+**Para el Frontend (`/frontend/.env`):**
+Este archivo es crucial para que Vue se conecte con el Backend y WebSockets.
 ```env
 VITE_API_URL=http://localhost:8000/api
-VITE_REVERB_APP_KEY=tu_app_key_del_backend
+VITE_REVERB_APP_KEY=tu_reverb_app_key_aqui
 VITE_REVERB_HOST=localhost
 VITE_REVERB_PORT=8080
 VITE_REVERB_SCHEME=http
 ```
 
-Inicia el servidor de desarrollo:
+### 3. Levantar los Contenedores
+Ejecuta el siguiente comando en la raíz del proyecto para descargar las imágenes, construir el frontend y encender el servidor:
+
 ```bash
-npm run dev
+docker compose up -d --build
+```
+
+### 4. Preparar la Base de Datos (Migraciones y Semillas)
+Una vez que todos los contenedores digan "Up" o "Started", necesitas crear las tablas en MySQL y llenarlas con datos de prueba:
+
+```bash
+# Ejecutar migraciones e insertar datos semilla
+docker compose exec app php artisan migrate --seed
 ```
 
 ### 5. Acceder a la aplicación
-Abre tu navegador en `http://localhost:5173` (o el puerto que te indique Vite) y ¡listo! Ya puedes acceder a la aplicación, interactuar con los incidentes y ver los cambios en tiempo real gracias a WebSockets.
-
-> [!TIP]
-> **Credenciales de Acceso por defecto (generadas por los Seeders):**
-> 
-> **Administrador (Todos los permisos):**
-> - **Email:** `admin@incidentes.com`
-> - **Contraseña:** `P4ssw0rd`
-> 
-> **Agente Normal (Solo ve sus incidentes):**
-> - **Email:** `agente@incidentes.com`
-> - **Contraseña:** `P4ssw0rd`
-> 
-> *(Se generan también otros agentes de forma aleatoria con la misma contraseña).*
+Abre tu navegador web en: **`http://localhost:8000`**
 
 ---
 
-## 🧪 Ejecución de Pruebas (Testing)
+## 🔐 Credenciales de Acceso (Seeders)
 
-El proyecto viene con una suite de pruebas para el Backend. Para asegurarte de que todo funcione correctamente y de que las refactorizaciones cumplan con los estándares esperados, puedes ejecutar los tests.
+El comando `--seed` que ejecutaste arriba crea 10 usuarios en el sistema. Puedes usar cualquiera de los siguientes para iniciar sesión:
 
-Abre una terminal en la carpeta `/backend` y ejecuta:
+> **Contraseña global para TODOS los usuarios:** `P4ssw0rd`
 
-```bash
-php artisan test
-```
+| Rol | Correo Electrónico | Permisos |
+| :--- | :--- | :--- |
+| **Administrador** | `admin@incidentes.com` | Puede ver, editar y borrar TODOS los incidentes del sistema. |
+| **Agente (Fijo)** | `agente@incidentes.com` | Solo puede ver y gestionar los incidentes que se le han asignado. |
+| **Agentes (Random)** | *Generados aleatoriamente* | 8 agentes adicionales creados con datos falsos por Faker. |
 
-Esto correrá todos los *Feature Tests* y *Unit Tests* asegurando que la API de incidentes y las lógicas del dashboard están funcionando al 100%.
+*Para ver los correos de los agentes aleatorios puedes ejecutar:*
+`docker compose exec app php artisan tinker --execute="echo User::where('role', 'agent')->pluck('email')->implode(PHP_EOL);"`
+
+---
+
+## 🚀 Despliegue en Producción (CI/CD)
+
+El proyecto cuenta con integración continua configurada en `.github/workflows/deploy.yml`. 
+Cada vez que haces un `git push` a la rama `main`, GitHub Actions se conecta automáticamente a tu servidor (Hetzner) mediante SSH y:
+1. Descarga los últimos cambios.
+2. Reconstruye de forma segura los contenedores Docker (`docker compose up -d --build`).
+3. Actualiza las dependencias de Composer sin afectar la operatividad.
+4. Aplica las migraciones de Base de Datos.
+
+**Nota técnica de Nginx:** Nginx está configurado con un **DNS Resolver dinámico (127.0.0.11)** de Docker, lo que garantiza CERO errores de *502 Bad Gateway* cuando los contenedores internos cambian sus direcciones IP tras un despliegue.

@@ -3,7 +3,7 @@ name: Deploy to Hetzner
 on:
   push:
     branches:
-      - main # Ejecutar solo cuando se hace push a la rama main
+      - main
 
 jobs:
   deploy:
@@ -16,23 +16,13 @@ jobs:
       - name: 🚀 Deploy to Server via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.HETZNER_HOST }}       # IP de tu servidor Hetzner
-          username: ${{ secrets.HETZNER_USER }}   # Usuario (ej. root)
-          password: ${{ secrets.HETZNER_PASSWORD }} # Contraseña de tu servidor
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USER }}
+          password: ${{ secrets.HETZNER_PASSWORD }}
           script: |
             cd /var/www/prueba-tecnica
-            
-            # Traer los últimos cambios
             git pull origin main
-            
-            # Reconstruir y reiniciar los contenedores de Docker en segundo plano
             docker compose up -d --build || docker-compose up -d --build
-            
-            # Instalar dependencias dentro del backend
             docker compose exec -T app composer install --optimize-autoloader --no-dev || docker-compose exec -T app composer install --optimize-autoloader --no-dev
-            
-            # Correr migraciones automáticamente por si hay nuevas tablas
             docker compose exec -T app php artisan migrate --force || docker-compose exec -T app php artisan migrate --force
-            
-            # Limpiar caché de Laravel para asegurar que tome los últimos cambios
             docker compose exec -T app php artisan optimize:clear || docker-compose exec -T app php artisan optimize:clear
