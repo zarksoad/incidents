@@ -8,14 +8,28 @@ services:
     working_dir: /var/www
     volumes:
       - ./backend:/var/www
-    ports:
-      - "8080:8080" # Reverb
     networks:
       - app-network
     depends_on:
       db:
         condition: service_healthy
 
+  reverb:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: incident_reverb
+    restart: unless-stopped
+    working_dir: /var/www
+    command: php artisan reverb:start --host=0.0.0.0 --port=8080
+    volumes:
+      - ./backend:/var/www
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+    depends_on:
+      - app
   nginx:
     image: nginx:alpine
     container_name: incident_nginx
